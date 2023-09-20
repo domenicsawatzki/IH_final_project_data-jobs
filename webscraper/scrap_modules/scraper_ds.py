@@ -9,6 +9,27 @@ import pandas as pd
 from datetime import date
 from datetime import datetime
 import json
+import pymysql                        
+from sqlalchemy import create_engine
+
+
+
+def connect_sql_database():
+    try:
+        with open("webscraper/sql_secret.txt", "r") as secret:
+            secret = secret.read()
+        connection_string = 'mysql+pymysql://root:'+secret+'@localhost/bank'
+        engine = create_engine(connection_string)
+        data = pd.read_sql_query('SELECT * FROM final_project.linked_in_scrap', engine)
+        return data 
+    except: 
+        print("Error connecting to mysql database.")
+        return None
+
+def initialize_empty_df():
+    columns = ['id','title', 'company', 'posting_date', 'job_description', 'seniority_level', 'job_function', 'industries', 'scraping_date', 'url', 'keyword']
+    scraper_df = pd.DataFrame(columns=columns)
+    return scraper_df
 
 def get_job_information(soup):    
     class_soup = soup.find("ul", {"class":"description__job-criteria-list"}).find_all('span')
@@ -188,3 +209,6 @@ def get_id_dict(list):
         print("I will sleep for " + str(wait_time/1000) + " seconds.\n")
         sleep(wait_time/1000)
     return id_list
+
+def test():
+    print('test')
