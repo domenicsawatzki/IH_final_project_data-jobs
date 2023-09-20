@@ -1,0 +1,21 @@
+{
+    "columns":[
+        "id",
+        "title",
+        "company",
+        "time",
+        "job_description",
+        "seniority_level",
+        "job_function",
+        "industries",
+        "Scraping_date",
+        "url",
+        "keyword"
+    ],
+    "index":[
+
+    ],
+    "data":[
+
+    ]
+}
