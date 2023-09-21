@@ -12,7 +12,12 @@ import json
 import pymysql                        
 from sqlalchemy import create_engine
 
-
+def import_keyword_list():
+    with open("keyword_list.csv", "r") as file:
+        keywords = pd.read_csv(file, delimiter = ";")
+    keywords["Keywords"] = keywords["Keywords"].str.replace(" ", "%20") # replace all spaces with %20 for thr URL
+    keyword_list = keywords['Keywords'].tolist() # creating a list
+    return keyword_list
 
 def connect_sql_database():
     try:
