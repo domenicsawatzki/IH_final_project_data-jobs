@@ -12,6 +12,70 @@ import json
 import pymysql                        
 from sqlalchemy import create_engine
 
+
+def total_loop_rough_keywords(keyword_list, dataframe, id_control, url):
+    soup_dict = {}
+    links = {}
+    for key in keyword_list:
+        first_url = f"https://www.linkedin.com/jobs/search?keywords=%7Bkey%7D&location=Berlin%2C%20Berlin%2C%20Germany&locationId=&geoId=106967730&f_TPR=&f_PP=106967730&distance=25&f_JT=F&f_E=2%2C3%2C4&position=1&pageNum=0"
+        key_name = key.replace('%20', " ")
+            
+        response = requests.get(first_url) # first request for keyword
+        response.status_code # 200 status code means OK!
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        number_of_results = soup.find('span', class_="results-context-header__job-count").text # check number of searching results
+        numb = int(number_of_results.replace(",", "").replace("+", ""))
+
+        
+        backend_call_url_list = create_backend_links(first_url, numb, key_name) # create list with sublinks to select different pages 
+        
+        
+        # with open(f'{key_name}_backend_urls.pkl', 'wb') as file:
+        #     pickle.dump(backend_call_url_list, file)
+        
+        id_list = get_id_dict(backend_call_url_list) # get job id's from all pages
+        
+        with tqdm(total=len(id_list), desc="Starting") as pbar:
+            for id in id_list:
+                dynamic_text = f"Progressing id: {id}" # text for tqdm progress bar status
+                pbar.set_description(dynamic_text) # change text
+                
+                if id not in id_control:
+                    try:
+                        scraper_df, id_control, small_soup = get_all_job_information(key_name, scraper_df, id, id_control) # 
+                        wait_time = randint(1,3000)
+                        pbar.set_description(f"Sleep {wait_time} seconds")
+                        sleep(wait_time/1000)
+                        
+                        soup_dict[id] = small_soup
+                    except:
+                        print(f"Error when scraping data from id: {id}, temp backups are created in temp_data.")
+                        scraper_df_json = scraper_df.to_json('dataframe.json', orient='split', date_format='iso', indent=4)
+                        with open(f'temp_data/back_up_df.json', 'wb') as file:
+                            json.dump(scraper_df_json, file=file)
+                        with open('temp_data/small_soup_backup.json', 'w') as f:
+                            json.dump(small_soup, f)
+                        # with open('temp_data/id_list_backup.pkl', "wb") as file:
+                        #     pickle.dump(links, file=file)
+                else:
+                    pbar.set_description(f"Will skip {id} because is already in the dataset.")
+                pbar.update(1)
+        
+        current_date = datetime.now()
+        time = current_date.strftime("%Y-%m-%d_%H-%M-%S")
+        time
+        return dataframe
+
+    with open(f'webscrap_data/webscrap{str(time)}.pkl', 'wb') as file:
+        pickle.dump(scraper_df, file=file)
+    display(scraper_df.tail(5))
+    wait_time = randint(1,10000)
+    print("I will sleep for " + str(wait_time/1000) + " seconds.")
+    sleep(wait_time/1000)
+
+
+
 def import_keyword_list():
     with open("keyword_list.csv", "r") as file:
         keywords = pd.read_csv(file, delimiter = ";")
@@ -32,7 +96,7 @@ def connect_sql_database():
         return None
 
 def initialize_empty_df():
-    columns = ['id','title', 'company', 'posting_date', 'job_description', 'seniority_level', 'job_function', 'industries', 'scraping_date', 'url', 'keyword']
+    columns = ['id','title', 'company', 'city', 'posting_date', 'job_description', 'seniority_level', 'job_function', 'industries', 'scraping_date', 'url', 'keyword']
     scraper_df = pd.DataFrame(columns=columns)
     return scraper_df
 
@@ -83,6 +147,11 @@ def get_all_job_information(keyword, dataframe, id, id_control):
         
     try:    
         job_dict['company'] = soup.find("div",{"class":"top-card-layout__card"}).find("a").find("img").get('alt')
+    except:
+        job_dict['company'] = None
+        
+    try:    
+        job_dict['company'] = soup.find("span",{"class":"topcard__flavor"}).text.strip()
     except:
         job_dict['company'] = None
 
