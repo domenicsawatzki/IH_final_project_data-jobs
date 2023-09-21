@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS linked_in_scrap
 id INTEGER PRIMARY KEY,
 title varchar(50),
 company varchar(50),
+city varchar(50),
 posting_date date,
 job_description JSON,
 seniority_level varchar(50),

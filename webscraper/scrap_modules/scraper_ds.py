@@ -13,67 +13,75 @@ import pymysql
 from sqlalchemy import create_engine
 
 
-def total_loop_rough_keywords(keyword_list, dataframe, id_control, url):
-    soup_dict = {}
-    links = {}
-    for key in keyword_list:
-        first_url = f"https://www.linkedin.com/jobs/search?keywords=%7Bkey%7D&location=Berlin%2C%20Berlin%2C%20Germany&locationId=&geoId=106967730&f_TPR=&f_PP=106967730&distance=25&f_JT=F&f_E=2%2C3%2C4&position=1&pageNum=0"
-        key_name = key.replace('%20', " ")
-            
-        response = requests.get(first_url) # first request for keyword
-        response.status_code # 200 status code means OK!
-        soup = BeautifulSoup(response.content, "html.parser")
-        
-        number_of_results = soup.find('span', class_="results-context-header__job-count").text # check number of searching results
-        numb = int(number_of_results.replace(",", "").replace("+", ""))
-
-        
-        backend_call_url_list = create_backend_links(first_url, numb, key_name) # create list with sublinks to select different pages 
-        
-        
-        # with open(f'{key_name}_backend_urls.pkl', 'wb') as file:
-        #     pickle.dump(backend_call_url_list, file)
-        
-        id_list = get_id_dict(backend_call_url_list) # get job id's from all pages
-        
-        with tqdm(total=len(id_list), desc="Starting") as pbar:
-            for id in id_list:
-                dynamic_text = f"Progressing id: {id}" # text for tqdm progress bar status
-                pbar.set_description(dynamic_text) # change text
+def total_loop_rough_keywords(keyword_list, scraper_df, id_control):
+    try:
+        soup_dict = {}
+        # links = {}
+        for key in keyword_list:
+            first_url = f"https://www.linkedin.com/jobs/search?keywords={key}&location=Berlin%2C%20Berlin%2C%20Germany&locationId=&geoId=104944500&f_TPR=&distance=25&f_E=2%2C3%2C4&position=1&pageNum=0"
+            key_name = key.replace('%20', " ")
                 
-                if id not in id_control:
-                    try:
-                        scraper_df, id_control, small_soup = get_all_job_information(key_name, scraper_df, id, id_control) # 
-                        wait_time = randint(1,3000)
-                        pbar.set_description(f"Sleep {wait_time} seconds")
-                        sleep(wait_time/1000)
-                        
-                        soup_dict[id] = small_soup
-                    except:
-                        print(f"Error when scraping data from id: {id}, temp backups are created in temp_data.")
-                        scraper_df_json = scraper_df.to_json('dataframe.json', orient='split', date_format='iso', indent=4)
-                        with open(f'temp_data/back_up_df.json', 'wb') as file:
-                            json.dump(scraper_df_json, file=file)
-                        with open('temp_data/small_soup_backup.json', 'w') as f:
-                            json.dump(small_soup, f)
-                        # with open('temp_data/id_list_backup.pkl', "wb") as file:
-                        #     pickle.dump(links, file=file)
-                else:
-                    pbar.set_description(f"Will skip {id} because is already in the dataset.")
-                pbar.update(1)
+            response = requests.get(first_url) # first request for keyword
+            response.status_code # 200 status code means OK!
+            soup = BeautifulSoup(response.content, "html.parser")
+            
+            number_of_results = soup.find('span', class_="results-context-header__job-count").text # check number of searching results
+            numb = int(number_of_results.replace(",", "").replace("+", ""))
+
+            backend_call_url_list = []
+            backend_call_url_list = create_backend_links(first_url, numb, key_name) # create list with sublinks to select different pages 
+            
+            
+            # with open(f'{key_name}_backend_urls.pkl', 'wb') as file:
+            #     pickle.dump(backend_call_url_list, file)
+            
+            id_list = get_id_dict(backend_call_url_list) # get job id's from all pages
+            
+            with tqdm(total=len(id_list), desc="Starting") as pbar:
+                for id in id_list:
+                    dynamic_text = f"Progressing id: {id}" # text for tqdm progress bar status
+                    pbar.set_description(dynamic_text) # change text
+                    
+                    if id not in id_control:
+                        try:
+                            scraper_df, id_control, small_soup = get_all_job_information(key_name, scraper_df, id, id_control) # 
+                            wait_time = randint(1,3000)
+                            pbar.set_description(f"Sleep {wait_time} seconds")
+                            sleep(wait_time/1000)
+                            
+                            soup_dict[id] = small_soup
+                            
+                            display(scraper_df.tail(1))
+                            # display(soup_dict)
+
+                        except:
+                            print(f"Error when scraping data from id: {id}, temp backups are created in temp_data.")
+                            
+                            scraper_df_json = scraper_df.to_json('dataframe.json', orient='split', date_format='iso', indent=4)
+                            with open(f'temp_data/back_up_df.json', 'wb') as file:
+                                json.dump(scraper_df_json, file=file)
+                            with open('temp_data/small_soup_backup.json', 'w') as f:
+                                json.dump(small_soup, f)
+                            # with open('temp_data/id_list_backup.pkl', "wb") as file:
+                            #     pickle.dump(links, file=file)
+                    else:
+                        pbar.set_description(f"Will skip {id} because is already in the dataset.")
+                    pbar.update(1)
+            
+            # current_date = datetime.now()
+            # time = current_date.strftime("%Y-%m-%d_%H-%M-%S")
+            # time
         
-        current_date = datetime.now()
-        time = current_date.strftime("%Y-%m-%d_%H-%M-%S")
-        time
-        return dataframe
-
-    with open(f'webscrap_data/webscrap{str(time)}.pkl', 'wb') as file:
-        pickle.dump(scraper_df, file=file)
-    display(scraper_df.tail(5))
-    wait_time = randint(1,10000)
-    print("I will sleep for " + str(wait_time/1000) + " seconds.")
-    sleep(wait_time/1000)
-
+        # with open(f'webscrap_data/webscrap{str(time)}.pkl', 'wb') as file:
+        #     pickle.dump(scraper_df, file=file)
+        display(scraper_df.tail(5))
+        wait_time = randint(1,10000)
+        print("I will sleep for " + str(wait_time/1000) + " seconds.")
+        sleep(wait_time/1000)
+        return scraper_df, soup_dict[id]
+    
+    except:
+        return scraper_df, soup_dict[id] 
 
 
 def import_keyword_list():
@@ -151,9 +159,9 @@ def get_all_job_information(keyword, dataframe, id, id_control):
         job_dict['company'] = None
         
     try:    
-        job_dict['company'] = soup.find("span",{"class":"topcard__flavor"}).text.strip()
+        job_dict['city'] = soup.find("span",{"class":"topcard__flavor topcard__flavor--bullet"}).text.strip()
     except:
-        job_dict['company'] = None
+        job_dict['city'] = None
 
     try:
         job_dict['posting_date'] = soup.find("span", {"class":"posted-time-ago__text"}).text.strip()
@@ -161,7 +169,7 @@ def get_all_job_information(keyword, dataframe, id, id_control):
         job_dict['posting_date'] = None
         
     try:    
-        job_dict['job_description'] = get_job_description(soup)
+        job_dict['job_description'] = soup.find("section",{"class":"show-more-less-html"}).text.strip()
 
     except:
         job_dict['job_description'] = None
@@ -192,12 +200,12 @@ def get_all_job_information(keyword, dataframe, id, id_control):
         name = name.replace(" ", "%20")
         company = job_dict['company']
         company = company.replace(" ", "%20")
-        job_dict['job_url'] = f"https://www.linkedin.com/jobs/search?keywords={name}%20{company}&location=Berlin%2C%20Berlin%2C%20Germany&geoId=&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0"
+        job_dict['url'] = f"https://www.linkedin.com/jobs/search?keywords={name}%20{company}&location=Berlin%2C%20Berlin%2C%20Germany&geoId=&trk=public_jobs_jobs-search-bar_search-submit&position=1&pageNum=0"
     except:
-        job_dict['job_url'] = None
+        job_dict['url'] = None
     
     job_dict['keyword'] = keyword 
-    small_soup = soup.find("div", {"class":"description__text"})
+    small_soup = soup # .find("div", {"class":"description__text"})
     
     try:
         new_row_df = pd.DataFrame([job_dict])
@@ -215,7 +223,10 @@ def get_all_job_information(keyword, dataframe, id, id_control):
 def create_backend_links(link, number_of_results, key_name):
     
     # check the number of results and calc the amounts of pages
-    number_of_loops = math.ceil(number_of_results/25)
+    
+    if number_of_results > 50: # for testing 
+        number_of_loops = 2
+    # number_of_loops = math.ceil(number_of_results/25)
     # counter 
     start = 0
     
