@@ -13,6 +13,7 @@ import pymysql
 from sqlalchemy import create_engine
 import sqlalchemy
 import zlib
+import numpy as np
 
 
 def total_loop_rough_keywords(keyword_list, scraper_df, id_control, soup_dict, keyword_dict): 
