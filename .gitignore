@@ -1,1 +1,9 @@
 sql_secret.txt
+IH_final_project_data-jobs/myenv/
+myenv\
+myenv/
+*.pkl
+*.wav
+*.json
+*.csv
+*.txt

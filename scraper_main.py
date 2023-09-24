@@ -14,22 +14,24 @@ from sqlalchemy import create_engine, text  # for establishing the connection an
 
 from webscraper.scrap_modules import scraper_ds as mybib
 from IPython.display import display
+import streamlit as st 
+
 
 
 keyword_list = mybib.import_keyword_list()
-print(f"Following keywords are used to scrap data from linkedIn: {keyword_list}")
+st.text(f"Following keywords are used to scrap data from linkedIn: {keyword_list}")
 
 
 sql_data = mybib.connect_sql_database()
 scraper_df = mybib.initialize_empty_df()
 
-print("Overview SQL Database")
-display(sql_data.head(5))
-display(sql_data.tail(5))
+st.write("Overview SQL Database")
+st.write(sql_data.head(5))
+st.write(sql_data.tail(5))
 
-print("Empty Dataframe")
-display(scraper_df)
+st.write("Empty Dataframe")
+st.write(scraper_df)
 
-print("Overview ID control")
+st.write("Overview ID control")
 id_control = sql_data['id'].tolist()
 id_control
