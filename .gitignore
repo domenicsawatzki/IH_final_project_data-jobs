@@ -1,7 +1,7 @@
 sql_secret.txt
 IH_final_project_data-jobs/myenv/
-myenv\
 myenv/
+webscraper/archiv/
 *.pkl
 *.wav
 *.json

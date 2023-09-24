@@ -320,7 +320,7 @@ def get_id_list(list):
     
     # dictionary to store id list for every page
     counter = 0
-    id_list =[]
+    id_array = pd.array([])
     for item in tqdm(list):
         response = requests.get(item)
         # print(f'Start extracting ids from {item}')
@@ -335,18 +335,18 @@ def get_id_list(list):
                 if jobid:
                     jobid = jobid.split(":")[3]
                     # print(jobid)
-                    id_list.append(jobid)
+                    id_array = np.append(id_array, jobid)
                 else:
                     print("data-entity-urn attribute not found for this job.")
             else:
                 print("")
-        # print(f"ID_list len: {len(id_list)}")
+        # print(f"id_array len: {len(id_array)}")
         
         wait_time = randint(500,1500)
         # print("I will sleep for " + str(wait_time/1000) + " seconds.\n")
         sleep(wait_time/1000)
     counter +=1
-    return id_list
+    return id_array
 
 def test():
     print('test')
