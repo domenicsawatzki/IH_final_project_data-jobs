@@ -3,6 +3,13 @@ import pandas as pd
 from datetime import date
 from datetime import datetime
 from tqdm import tqdm
+import pickle
+import requests
+
+
+cleaned_data_path = 'webscraper/cleaned_data/'
+webscrap_data_path = 'webscraper/'
+
 
 def get_all_job_information(id, response, scrap_date):
 
@@ -13,31 +20,31 @@ def get_all_job_information(id, response, scrap_date):
         job_dict['title'] = soup.find('h2', class_='top-card-layout__title').text.strip()
     except:
         job_dict['title'] = None
-        print("Error: in 'title'")
+        # print("Error: in 'title'")
         
     try:    
         job_dict['company'] = soup.find("div",{"class":"top-card-layout__card"}).find("a").find("img").get('alt')
     except:
         job_dict['company'] = None
-        print("Error: in 'company'")
+        # print("Error: in 'company'")
         
     try:    
         job_dict['city'] = soup.find("span",{"class":"topcard__flavor topcard__flavor--bullet"}).text.strip()
     except:
         job_dict['city'] = None
-        print("Error: in 'city'")
+        # print("Error: in 'city'")
     try:
         job_dict['posting_date'] = soup.find("span", {"class":"posted-time-ago__text"}).text.strip()
     except:
         job_dict['posting_date'] = None
-        print("Error: in 'posting date'")
+        # print("Error: in 'posting date'")
         
     try:    
         job_dict['job_description'] = soup.find("section",{"class":"show-more-less-html"}).text.strip()
 
     except:
         job_dict['job_description'] = None
-        print("Error: in 'job description'")
+        # print("Error: in 'job description'")
 
     try:    
         x = get_job_information(soup)        
@@ -46,7 +53,7 @@ def get_all_job_information(id, response, scrap_date):
         job_dict['job_function'] = x[2]
         job_dict['industries'] = x[3]
     except:
-        print(f"Error: get job information in id {id}")
+        # print(f"Error: get job information in id {id}")
         job_dict['seniority_level'] = None
         job_dict['employment_type'] = None
         job_dict['job_function'] = None
@@ -113,5 +120,10 @@ def second_request_empty_values(df):
     temp_df = df[df["title"].notna()]
     final_df = pd.concat([temp_df, new_nan_df], ignore_index=True)
     
+    save_cleaned_df(final_df)
+    
     return final_df
-            
+
+def save_cleaned_df(df):
+    with open(f"{cleaned_data_path}cleaned_dataframe.pkl", "wb") as file:
+        pickle.dump(df, file)
