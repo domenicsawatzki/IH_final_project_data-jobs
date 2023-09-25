@@ -343,9 +343,9 @@ def get_id_list(list):
                 print("")
         # print(f"id_array len: {len(id_array)}")
         
-        wait_time = randint(500,1500)
+        # wait_time = randint(500,1500)
         # print("I will sleep for " + str(wait_time/1000) + " seconds.\n")
-        sleep(wait_time/1000)
+        # sleep(wait_time/1000)
     counter +=1
     return id_array
 

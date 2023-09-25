@@ -7,3 +7,4 @@ webscraper/archiv/
 *.json
 *.csv
 *.txt
+keyword_list.csv
