@@ -130,3 +130,4 @@ def second_request_empty_values(df, max_sleeptime = 2000):
 def save_cleaned_df(df):
     with open(f"{cleaned_data_path}cleaned_dataframe.pkl", "wb") as file:
         pickle.dump(df, file)
+        
