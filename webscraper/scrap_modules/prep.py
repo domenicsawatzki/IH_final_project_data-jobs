@@ -123,11 +123,22 @@ def second_request_empty_values(df, max_sleeptime = 2000):
     temp_df = df[df["title"].notna()]
     final_df = pd.concat([temp_df, new_nan_df], ignore_index=True)
     
-    save_cleaned_df(final_df)
-    
     return final_df
 
-def save_cleaned_df(df):
-    with open(f"{cleaned_data_path}cleaned_dataframe.pkl", "wb") as file:
+def save_cleaned_df(df, name):
+    with open(f"{cleaned_data_path}{name}.pkl", "wb") as file:
         pickle.dump(df, file)
         
+def null_value_cleaner(df, rounds):
+    null_counter = df['title'].isna().sum()
+    sleeptime = 2000
+    for i in range(rounds):
+        if null_counter == 0:
+            print(f"Finished in round {id}")
+            return df
+        else:
+            df = prep.second_request_empty_values(df, max_sleeptime = sleeptime)
+            null_counter = df['title'].isna().sum()
+            print(f"Round{i}: {null_counter} empty values left")
+            sleeptime += 500
+    return df

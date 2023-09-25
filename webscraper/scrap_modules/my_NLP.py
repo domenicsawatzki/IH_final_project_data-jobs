@@ -47,6 +47,7 @@ def clean_up(s):
     s = re.sub('- ', ' ', s)
     s = re.sub(': ', ' ', s)
     s = re.sub(', ', ' ', s)
+    s = re.sub('*', ' ', s)
 
 
 
