@@ -5,6 +5,8 @@ from datetime import datetime
 from tqdm import tqdm
 import pickle
 import requests
+from random import randint
+from time import sleep
 
 
 cleaned_data_path = 'webscraper/cleaned_data/'
@@ -100,20 +102,21 @@ def get_job_information(soup):
     
     return list
 
-def second_request_empty_values(df):
+def second_request_empty_values(df, max_sleeptime = 2000):
     nan_df = df[df["title"].isna()]
     second_requests = nan_df['id'].tolist()
     
     request_dict = {}
-    for id in second_requests:
+    for id in tqdm(second_requests):
             response = requests.get(f'https://www.linkedin.com/jobs-guest/jobs/api/jobPosting/{id}')
-            wait_time = randint(1,500)
+            wait_time = randint(500,max_sleeptime)
             sleep(wait_time/1000)
 
             temp_dict = {}
             temp_dict["scrap_date"] = date.today()
             temp_dict["response"] = response
             request_dict[id] = temp_dict
+
     
     new_nan_df = transform_scrap_data_to_df(request_dict)
     

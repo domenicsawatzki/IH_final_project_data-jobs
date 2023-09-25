@@ -293,7 +293,7 @@ def create_backend_links(link, number_of_results, key_name):
     # backend_call = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/{link_key}start={start}"
     
     # initialize the list 
-    backend_call_list = []
+    backend_call_array = pd.array([])
     
     # loopt through number of pages and store the backend_call URL's 
     for i in range(number_of_loops):
@@ -301,10 +301,10 @@ def create_backend_links(link, number_of_results, key_name):
         
         # use the created link keys and counter to create backend_call URL   
         backend_call = f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/{link_key}start={start}"
-        backend_call_list.append(backend_call)
+        backend_call_array = np.append(backend_call_array, backend_call)
         start += 25
         
-    return backend_call_list 
+    return backend_call_array 
 
 def save_df_as_json_with_time_stamp(df):   
     current_date = datetime.now()
@@ -339,8 +339,6 @@ def get_id_list(list):
                     id_array = np.append(id_array, jobid)
                 else:
                     print("data-entity-urn attribute not found for this job.")
-            else:
-                print("")
         # print(f"id_array len: {len(id_array)}")
         
         # wait_time = randint(500,1500)
