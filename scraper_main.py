@@ -18,6 +18,7 @@ import streamlit as st
 
 
 
+
 keyword_list = mybib.import_keyword_list()
 st.text(f"Following keywords are used to scrap data from linkedIn: {keyword_list}")
 

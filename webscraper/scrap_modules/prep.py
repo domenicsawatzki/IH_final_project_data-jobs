@@ -137,8 +137,17 @@ def null_value_cleaner(df, rounds):
             print(f"Finished in round {id}")
             return df
         else:
-            df = prep.second_request_empty_values(df, max_sleeptime = sleeptime)
+            df = second_request_empty_values(df, max_sleeptime = sleeptime)
             null_counter = df['title'].isna().sum()
             print(f"Round{i}: {null_counter} empty values left")
             sleeptime += 500
     return df
+
+def search_keyword(x, dict):
+    for key in dict:
+        if x == dict:
+            y = dict[item]
+            return y
+        else:
+            y = 'unknown'
+    return y

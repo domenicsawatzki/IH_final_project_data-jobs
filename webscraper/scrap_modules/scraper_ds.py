@@ -15,6 +15,9 @@ import sqlalchemy
 import zlib
 import numpy as np
 
+soup_file =  'soup_dictV2'
+keyword_file = 'keyword_dictV2'
+
 
 def total_loop_rough_keywords(keyword_list, scraper_df, id_control, soup_dict, keyword_dict): 
 
@@ -358,10 +361,10 @@ def export_data(soup_dict, keyword_dict):
         # mybib.add_scrapped_df_to_sql_database(Scrap_backup, con=engine, if_exists='replace', index=False))
 
         
-        with open("webscraper/webscrap_data/soup_dict.pkl", "wb") as file:
+        with open(f"webscraper/webscrap_data/{soup_file}.pkl", "wb") as file:
             pickle.dump(soup_dict, file=file)
 
-        with open("webscraper/webscrap_data/keyword_dict.pkl", "wb") as file:
+        with open(f"webscraper/webscrap_data/{keyword_file}.pkl", "wb") as file:
             pickle.dump(keyword_dict, file)
             
         # with open("webscraper/webscrap_data/database.pkl", "wb") as file:
