@@ -113,20 +113,37 @@ def re_blob(x):
 
 def combine_keywords(s):
 
-    s = re.sub('data analyst', 'data_analyst', s)
+    s = re.sub('data analyst', ' data_analyst ', s)
+    s = re.sub('data analyst', ' data_analyst ', s)
     
-    s = re.sub('data engineer', 'data_engineer', s)
     
-    s = re.sub('business analyst', 'business_analyst', s)
+    s = re.sub('data engineer', ' data_engineer ', s)
+    
+    s = re.sub('business analyst', ' business_analyst', s)
+    s = re.sub('business-analyst', ' business_analyst', s)
     
     s = re.sub('product analyst', 'product_analyst ', s)
     
     s = re.sub('business intelligence analyst', 'business_intelligence_analyst', s)
-    s = re.sub('business intelligence', 'business_intelligence', s)
+    s = re.sub('business intelligence', 'business_intelligence_analyst', s)
+    s = re.sub('bi ', 'business_intelligence_analyst', s)
     
     s = re.sub('programm manager', 'programm_manager', s)
     
     s = re.sub('software engineer', 'software_engineer', s)
+    s = re.sub('software_engin', 'software_engineer', s)
+
+    
+    s = re.sub('software developer', 'software_developer', s)
+    s = re.sub('software entwickler', 'software_developer', s)
+    s = re.sub('softwareentwickler', 'software_developer', s)
+    s = re.sub('software_develop', 'software_developer', s)
+    s = re.sub('software-entwickl', 'software_developer', s)
+    s = re.sub('softwar develop', 'software_developer', s)
+    s = re.sub('software_develop', 'software_developer', s)
+    
+    
+    s = re.sub('system engineer', 'system_engineer', s)
     
     s = re.sub('analysis engineer', 'analysis_engineer', s)
     
@@ -136,28 +153,87 @@ def combine_keywords(s):
     
     s = re.sub('machine learn engineer', 'machine_learn_engineer', s)
     s = re.sub('machine learn', 'machine_learn_engineer', s)
+    s = re.sub('machine_learn', 'machine_learn_engineer', s)
     s = re.sub('ml ', 'machine_learn_engineer', s)
     
     s = re.sub('ai ', 'ai_engineer', s)
+    s = re.sub('artificial intelligence', 'ai_engineer', s)
     
-    s = re.sub('cloud ', 'cloud_engineer', s)
+    s = re.sub('cloud', 'cloud_engineer', s)
+    
+    s = re.sub('devops engineer ', 'devops_engineer', s)
+    s = re.sub('devops engin', 'devops_engineer', s)
+    s = re.sub('devop engin', 'devops_engineer', s)
     
     
-    s = re.sub('deep learn', 'deep_learn', s)
+    s = re.sub('devolop engin ', 'develop_engineer', s)
+    s = re.sub('entwicklungsingenieur', 'develop_engineer', s)
+    
+    
+    
+    s = re.sub('fp & a', 'fp&a_analyst', s)
+    
+    s = re.sub('deep learn', 'deep_learning', s)
     s = re.sub('reporting analyst', 'reporting_analyst', s)
+    
+    s = re.sub('sap ', 'sap_specialist', s)
 
+    s = re.sub('data analytics', 'data_analytics', s)
+    
+    s = re.sub('control', 'controlling_', s)
 
-
-
+    s = re.sub('test engin', 'test_engineer', s)
+    s = re.sub('test engineer', 'test_engineer', s)
+    
+    s = re.sub('big data', 'big_data_engineer/specialist', s)
+    
+    s = re.sub('java', 'java_software_engineer', s)
+    s = re.sub('java-', 'java_software_engineer', s)
+    s = re.sub('java ', 'java_software_engineer', s)
+    
+    s = re.sub('backend ', 'backend_developer', s)
+    
+    s = re.sub('it ', 'it_systemadmin', s)
+    
+    s = re.sub('data manag ', 'data_management', s)
+    
+    s = re.sub('full stack ', 'full_stack', s)
+    s = re.sub('full-stack ', 'full_stack', s)
+    s = re.sub('fullstack ', 'full_stack', s)
+    
+    s = re.sub('database administr ', 'database_datawarehouse', s)
+    s = re.sub('datenbankadministr ', 'database_datawarehouse', s)
+    s = re.sub('datenbank-administr ', 'database_datawarehouse', s)
+    s = re.sub('datenbank-administr ', 'database_datawarehouse', s)
+    s = re.sub('datenbank-administr ', 'database_datawarehouse', s)
+    s = re.sub('data warehous', 'database_datawarehouse', s)
+    
+    
+    s = re.sub('research scientist ', 'research_scientist', s)
+    s = re.sub('scientist', 'scientist_', s)
+    
+    s = re.sub('data architect', 'data_architect', s)
+    
+    
+    
+    
     return s
 
-def extract_keywords(row, column):
+def drop_words(s):
     
-    s = row[column]
+    droplist = ['campus', 'online', 'remote', 'berlin', 'hamburg', 'frankfurt', 'duales', 'mitarbeiter', 
+                'home office', 'teilzeit', 'vollzeit',  ]
+
+
+def extract_keywords(row):
     
-    keywords = ['data_analyst', 'data_engineer', 'business_analyst', 'product_analyst', 'business_intelligence_analyst', 'programm_manager',
-               'software_engineer', 'analysis_engineer', 'data_scientist', 'machine_learning_engineer', 'ai_engineer',
-               'cloud_engineer', 'deep_learning_engineer', 'reporting_analyst']
+    s = row['cp2_title']
+    
+    keywords = ['data_analyst', 'software_developer','scientist_','research_scientist', 'data_architect','java_software_engineer','data_engineer', 'database_datawarehouse', 'business_analyst', 'product_analyst', 
+                'business_intelligence_analyst', 'full_stack', 'database_administrator', 'fp&a_analyst', 'product_analyst'
+                'programm_manager', 'data_analytics', 'big_data_engineer/specialist', 'sap_specialist', 'devops_engineer', 'backend_developer', 'data_management'
+               'software_engineer', 'analysis_engineer', 'data_scientist', 'machine_learning_engineer', 'ai_engineer', 'controlling_', 'it_systemadmin'
+               'cloud_engineer', 'deep_learning', 'reporting_analyst', 'test_engineer', 'system_engineer', 'specialist', 'sap_specialist']
 
     for word in keywords:
         if word in s.lower():
@@ -168,10 +244,11 @@ def extract_keywords(row, column):
 
 
 def extract_level(row):
-    student_list = ['werkstudent', 'student', 'studium', 'wissenschaftlich']
+    student_list = ['werkstudent', 'praktikum','student', 'studium', 'wissenschaftlich', 'pflichtpraktikum', 'intern', 'masterarbeit', 'ausbildung'
+                    'bachelorarbeit']
     junior_list = ['junior', 'young professional']
     senior_list = ['senior', 'lead']
-    manager_list = ['manager']
+    manager_list = ['manager', 'head of', 'head ']
     consultant_list = ['consultant']
     
     s = row['cp2_title']
@@ -193,12 +270,12 @@ def extract_level(row):
             
     for word in senior_list:
         if word in s.lower():
-            row['job_level'] = 'senior level'
+            row['job_level'] = 'senior_level'
             s = re.sub(word, "", s)
             
     for word in manager_list:
         if word in s.lower():
-            row['job_level'] = 'manager level'
+            row['job_level'] = 'manager_level'
             s = re.sub(word, "", s)
             
     row['cp2_title'] = s
