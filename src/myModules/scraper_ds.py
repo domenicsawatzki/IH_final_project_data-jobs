@@ -15,6 +15,22 @@ import sqlalchemy
 import zlib
 import numpy as np
 
+import os 
+
+os.chdir('c:/Users/Domen/IronHack/01_projects/IH_final_project_data-jobs')
+print(os.getcwd())
+
+print(os.getcwd())
+with open("config/config.json", 'r') as f:
+    config = json.load(f)
+    
+temp_data_path = config["temp_data_path"]
+webscrap_data_path = config["webscrap_data_path"]    
+
+print(temp_data_path)
+print(webscrap_data_path)
+
+
 soup_file =  'soup_dictV2'
 keyword_file = 'keyword_dictV2'
 
@@ -316,7 +332,7 @@ def save_df_as_json_with_time_stamp(df):
     
     scraper_df_json = scraper_df.to_json('dataframe.json', orient='split', date_format='iso', indent=4)
 
-    with open(f'webscrap_data/webscrap{str(time)}.json', 'wb') as file:
+    with open(f'{webscrap_data_path}{str(time)}.json', 'wb') as file:
         json.dump(scraper_df_json, file=file)
         
 # go through each page URL and extract the job id's 
@@ -361,10 +377,10 @@ def export_data(soup_dict, keyword_dict):
         # mybib.add_scrapped_df_to_sql_database(Scrap_backup, con=engine, if_exists='replace', index=False))
 
         
-        with open(f"webscraper/webscrap_data/{soup_file}.pkl", "wb") as file:
+        with open(f"{webscrap_data_path}{soup_file}.pkl", "wb") as file:
             pickle.dump(soup_dict, file=file)
 
-        with open(f"webscraper/webscrap_data/{keyword_file}.pkl", "wb") as file:
+        with open(f"{webscrap_data_path}{keyword_file}.pkl", "wb") as file:
             pickle.dump(keyword_dict, file)
             
         # with open("webscraper/webscrap_data/database.pkl", "wb") as file:

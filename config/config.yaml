@@ -1,5 +1,0 @@
-file_paths:
-  webscraper_path:'/webscraper/webscrap_data/'
-  webscraper_backup_path:'/webscraper/temp_data/'
-  cleaned_data_path:'/webscraper/cleaned_data/'
-  
