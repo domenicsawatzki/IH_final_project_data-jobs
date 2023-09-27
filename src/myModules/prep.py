@@ -7,10 +7,23 @@ import pickle
 import requests
 from random import randint
 from time import sleep
+import os
+import json
 
 
-cleaned_data_path = 'webscraper/cleaned_data/'
-webscrap_data_path = 'webscraper/'
+os.chdir('c:/Users/Domen/IronHack/01_projects/IH_final_project_data-jobs')
+print(os.getcwd())
+
+print(os.getcwd())
+with open("config/config.json", 'r') as f:
+    config = json.load(f)
+    
+cleaned_data_path = config["cleaned_data_path"]
+webscrap_data_path = config["webscrap_data_path"]    
+
+
+# soup_file =  'soup_dictV2'
+# keyword_file = 'keyword_dictV2'
 
 
 def get_all_job_information(id, response, scrap_date):

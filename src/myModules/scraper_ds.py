@@ -14,6 +14,7 @@ from sqlalchemy import create_engine
 import sqlalchemy
 import zlib
 import numpy as np
+import json
 
 import os 
 
@@ -26,9 +27,6 @@ with open("config/config.json", 'r') as f:
     
 temp_data_path = config["temp_data_path"]
 webscrap_data_path = config["webscrap_data_path"]    
-
-print(temp_data_path)
-print(webscrap_data_path)
 
 
 soup_file =  'soup_dictV2'
