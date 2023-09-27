@@ -28,8 +28,9 @@ import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from wordcloud import WordCloud, STOPWORDS
+import spacy
 
-
+nlp = spacy.load("de_core_news_sm")
 
 def check_language(x):
     try:
@@ -52,13 +53,11 @@ def clean_up(s):
     pattern_to_remove = r'\([a-z]/[a-z]/[a-z]\)'
     s = re.sub(pattern_to_remove, '', s)
     s = re.sub('all genders', '', s)
-    s = re.sub('/', ' ', s)
-    s = re.sub('& ', ' ', s)
-    s = re.sub('– ', ' ', s)
-    s = re.sub('- ', ' ', s)
-    s = re.sub(': ', ' ', s)
-    s = re.sub(', ', ' ', s)
-    # s = re.sub('*', ' ', s)
+    # s = re.sub('[\,()/:;*?!&–|]', ' ', s)
+    s = re.sub(r'(?<=\w)\.', ' . ', s)
+    # s = re.sub(r'(?<=\w)\|', ' | ', s)
+    s = re.sub('--', ' ', s)
+    s = re.sub('&', ' ', s)
 
 
 
@@ -68,43 +67,38 @@ def tokenize(s):
     tokens = word_tokenize(s)
     return tokens
 
+nlp = spacy.load("de_core_news_sm")
 
-
-def get_wordnet_pos(word):
+def get_wordnet_pos(word, language):
     tag_dict = {"J": wordnet.ADJ, 
             "N": wordnet.NOUN,
             "V": wordnet.VERB,
             "R": wordnet.ADV}
-    tag = nltk.pos_tag([word], lang='eng')[0][1][0].upper()
+    tag = nltk.pos_tag([word], lang=language)[0][1][0].upper()
     return tag_dict.get(tag, wordnet.NOUN)
 
-def stem_and_lemmatize(l):
-    """
-    Perform stemming and lemmatization on a list of words.
-
-    Args:
-        l: A list of strings.
-
-    Returns:
-        A list of strings after being stemmed and lemmatized.
-    """
+def stem_and_lemmatize_english(l):
     lemmatizer = WordNetLemmatizer()
-    lemmatized = [lemmatizer.lemmatize(word, get_wordnet_pos(word)) for word in l]
+    lemmatized = [lemmatizer.lemmatize(word, get_wordnet_pos(word, 'eng')) for word in l]
     return lemmatized 
 
+def stem_and_lemmatize_german(l):
+    
+    text = nlp(l)
+    
+    lemmatized_tokens  = [token.lemma_ for token in text]
+    lemmatized_text = " ".join(lemmatized_tokens)
+    return lemmatized_text 
 
-def remove_stopwords(l):
-    """
-    Remove English stopwords from a list of strings.
 
-    Args:
-        l: A list of strings.
+def remove_stopwords_englisch(l, language = 'english'):
 
-    Returns:
-        A list of strings after stop words are removed.
-    """
-    text_no_sw = [word for word in l if not word in stopwords.words('english')]
-    text_no_sw = [word for word in l if not word in stopwords.words('german')]
+    text_no_sw = [word for word in l if not word in stopwords.words(language)]
+    return text_no_sw
+
+def remove_stopwords_german(l, language = 'german'):
+
+    text_no_sw = [word for word in l if not word in stopwords.words(language)]
     return text_no_sw
 
 def re_blob(x):
@@ -112,122 +106,122 @@ def re_blob(x):
 
 
 
-def combine_keywords(s):
+# def combine_keywords(s):
 
-    s = re.sub('data analyst', ' data_analyst ', s)
-    s = re.sub('data analyst', ' data_analyst ', s)
+#     s = re.sub('data analyst', ' data_analyst ', s)
+#     s = re.sub('data analyst', ' data_analyst ', s)
     
     
-    s = re.sub('data engineer', ' data_engineer ', s)
+#     s = re.sub('data engineer', ' data_engineer ', s)
     
-    s = re.sub('business analyst', ' business_analyst ', s)
-    s = re.sub('business-analyst', ' business_analyst ', s)
+#     s = re.sub('business analyst', ' business_analyst ', s)
+#     s = re.sub('business-analyst', ' business_analyst ', s)
     
-    s = re.sub('product analyst', ' product_analyst ', s)
+#     s = re.sub('product analyst', ' product_analyst ', s)
     
-    s = re.sub('business intelligence analyst', ' bi_analyst ', s)
-    s = re.sub('business intelligence', ' bi_analyst ', s)
-    s = re.sub('bi ', ' bi_analyst ', s)
+#     s = re.sub('business intelligence analyst', ' bi_analyst ', s)
+#     s = re.sub('business intelligence', ' bi_analyst ', s)
+#     s = re.sub('bi ', ' bi_analyst ', s)
     
-    s = re.sub('programm manager', ' programm_manager ', s)
+#     s = re.sub('programm manager', ' programm_manager ', s)
      
-    s = re.sub('software_engin', ' software_engineer ', s) 
-    s = re.sub('software engineer', ' software_engineer ', s)
-    s = re.sub('software_engineereer', ' software_engineer ', s)
+#     s = re.sub('software_engin', ' software_engineer ', s) 
+#     s = re.sub('software engineer', ' software_engineer ', s)
+#     s = re.sub('software_engineereer', ' software_engineer ', s)
 
-    s = re.sub('software-architect', ' software_architect ', s)
+#     s = re.sub('software-architect', ' software_architect ', s)
     
-    s = re.sub('software developer', ' software_developer ', s)
-    s = re.sub('software entwickler', ' software_developer ', s)
-    s = re.sub('softwareentwickler', ' software_developer ', s)
-    s = re.sub('software_develop', ' software_developer ', s)
-    s = re.sub('software-entwickler', ' software_developer ', s)
-    s = re.sub('softwar develop', ' software_developer ', s)
-    s = re.sub('software_develop', ' software_developer ', s)
-    s = re.sub('developer ', ' software_developer ', s)
-    s = re.sub('software ', ' software_developer ', s)
-    
-    
-    s = re.sub('system engineer', ' system_engineer ', s)
-    
-    s = re.sub('analysis engineer', ' analysis_engineer ', s)
-    
-    s = re.sub('data science', ' data_scientist ', s)
-    s = re.sub('data scientist', ' data_scientist ', s)
+#     s = re.sub('software developer', ' software_developer ', s)
+#     s = re.sub('software entwickler', ' software_developer ', s)
+#     s = re.sub('softwareentwickler', ' software_developer ', s)
+#     s = re.sub('software_develop', ' software_developer ', s)
+#     s = re.sub('software-entwickler', ' software_developer ', s)
+#     s = re.sub('softwar develop', ' software_developer ', s)
+#     s = re.sub('software_develop', ' software_developer ', s)
+#     s = re.sub('developer ', ' software_developer ', s)
+#     s = re.sub('software ', ' software_developer ', s)
     
     
-    s = re.sub('machine learn engineer', ' ml_engineer ', s)
-    s = re.sub('machine learn', ' ml_engineer ', s)
-    s = re.sub('machine_learn', ' ml_engineer ', s)
-    s = re.sub('ml ', ' ml_engineer ', s)
+#     s = re.sub('system engineer', ' system_engineer ', s)
     
-    s = re.sub('ai ', ' ai_engineer ', s)
-    s = re.sub('artificial intelligence', ' ai_engineer ', s)
+#     s = re.sub('analysis engineer', ' analysis_engineer ', s)
     
-    s = re.sub('cloud', ' cloud_engineer ', s)
-    s = re.sub('cloud_engin', ' cloud_engineer ', s)
+#     s = re.sub('data science', ' data_scientist ', s)
+#     s = re.sub('data scientist', ' data_scientist ', s)
     
     
-    s = re.sub('devops engineer ', ' devops_engineer ', s)
-    s = re.sub('devops engin', ' devops_engineer ', s)
-    s = re.sub('devop engin', ' devops_engineer ', s)
+#     s = re.sub('machine learn engineer', ' ml_engineer ', s)
+#     s = re.sub('machine learn', ' ml_engineer ', s)
+#     s = re.sub('machine_learn', ' ml_engineer ', s)
+#     s = re.sub('ml ', ' ml_engineer ', s)
+    
+#     s = re.sub('ai ', ' ai_engineer ', s)
+#     s = re.sub('artificial intelligence', ' ai_engineer ', s)
+    
+#     s = re.sub('cloud', ' cloud_engineer ', s)
+#     s = re.sub('cloud_engin', ' cloud_engineer ', s)
     
     
-    s = re.sub('devolop engin ', ' develop_engineer ', s)
-    s = re.sub('devolop_engineer', ' develop_engineer ', s)
-    s = re.sub('entwicklungsingenieur', ' develop_engineer ', s)
+#     s = re.sub('devops engineer ', ' devops_engineer ', s)
+#     s = re.sub('devops engin', ' devops_engineer ', s)
+#     s = re.sub('devop engin', ' devops_engineer ', s)
+    
+    
+#     s = re.sub('devolop engin ', ' develop_engineer ', s)
+#     s = re.sub('devolop_engineer', ' develop_engineer ', s)
+#     s = re.sub('entwicklungsingenieur', ' develop_engineer ', s)
     
     
     
-    s = re.sub('fp & a', ' fp&a_analyst ', s)
+#     s = re.sub('fp & a', ' fp&a_analyst ', s)
     
-    s = re.sub('deep learn', ' deep_learning ', s)
-    s = re.sub('reporting analyst', ' reporting_analyst ', s)
+#     s = re.sub('deep learn', ' deep_learning ', s)
+#     s = re.sub('reporting analyst', ' reporting_analyst ', s)
     
-    s = re.sub('sap ', ' sap_specialist ', s)
+#     s = re.sub('sap ', ' sap_specialist ', s)
 
-    s = re.sub('data analytics', ' data_analytics ', s)
+#     s = re.sub('data analytics', ' data_analytics ', s)
     
-    s = re.sub('control', ' controlling_ ', s)
+#     s = re.sub('control', ' controlling_ ', s)
 
-    s = re.sub('test engineer', ' test_engineer ', s)
-    s = re.sub('test engin', ' test_engineer ', s)
+#     s = re.sub('test engineer', ' test_engineer ', s)
+#     s = re.sub('test engin', ' test_engineer ', s)
     
-    s = re.sub('big data', ' big_data_engineer/specialist ', s)
+#     s = re.sub('big data', ' big_data_engineer/specialist ', s)
     
-    s = re.sub('java', ' java_software_engineer ', s)
-    s = re.sub('java-', ' java_software_engineer ', s)
-    s = re.sub('java ', ' java_software_engineer ', s)
+#     s = re.sub('java', ' java_software_engineer ', s)
+#     s = re.sub('java-', ' java_software_engineer ', s)
+#     s = re.sub('java ', ' java_software_engineer ', s)
     
-    s = re.sub('backend ', ' backend_developer ', s)
+#     s = re.sub('backend ', ' backend_developer ', s)
     
-    s = re.sub('it ', ' it_systemadmin ', s)
-    s = re.sub('systemadministrator', ' it_systemadmin ', s)
-    
-    
-    s = re.sub('data manag ', ' data_management ', s)
-    
-    s = re.sub('full stack ', ' full_stack ', s)
-    s = re.sub('full-stack ', ' full_stack ', s)
-    s = re.sub('fullstack ', ' full_stack ', s)
-    
-    s = re.sub('database administr ', ' database_datawarehouse ', s)
-    s = re.sub('datenbankadministr ', ' database_datawarehouse ', s)
-    s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
-    s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
-    s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
-    s = re.sub('data warehous', ' database_datawarehouse ', s)
+#     s = re.sub('it ', ' it_systemadmin ', s)
+#     s = re.sub('systemadministrator', ' it_systemadmin ', s)
     
     
-    s = re.sub('research scientist ', ' research_scientist ', s)
-    s = re.sub(' scientist ', ' scientist_ ', s)
+#     s = re.sub('data manag ', ' data_management ', s)
     
-    s = re.sub('data architect', 'data_architect', s)
+#     s = re.sub('full stack ', ' full_stack ', s)
+#     s = re.sub('full-stack ', ' full_stack ', s)
+#     s = re.sub('fullstack ', ' full_stack ', s)
+    
+#     s = re.sub('database administr ', ' database_datawarehouse ', s)
+#     s = re.sub('datenbankadministr ', ' database_datawarehouse ', s)
+#     s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
+#     s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
+#     s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
+#     s = re.sub('data warehous', ' database_datawarehouse ', s)
+    
+    
+#     s = re.sub('research scientist ', ' research_scientist ', s)
+#     s = re.sub(' scientist ', ' scientist_ ', s)
+    
+#     s = re.sub('data architect', 'data_architect', s)
     
     
     
     
-    return s
+#     return s
 
 def drop_words(s):
     
@@ -261,9 +255,6 @@ def extract_keywords(row):
 
 
     return row
-
-
-
 
 
 
@@ -315,7 +306,7 @@ def word_cloud(df, column):
     bag = []
     bag = " ".join(title_list)
     bag
-       
+
     stopwords = STOPWORDS
     wordcloud = WordCloud(stopwords=stopwords, background_color="white", max_words=1000).generate(bag)
     rcParams['figure.figsize'] = 10, 20
@@ -348,7 +339,6 @@ def get_job_title(row):
     s = re.sub('operations analyst', ' operations_analyst ', s) 
     s = re.sub('operation analyst', ' operations_analyst ', s) 
     
-     
     s = re.sub('data engineer', ' data_engineer ', s)
     s = re.sub('business analyst', ' business_analyst ', s)
     s = re.sub('business-analyst', ' business_analyst ', s)
@@ -391,7 +381,6 @@ def get_job_title(row):
     
     s = re.sub('ai ', ' ai_engineer ', s)
     s = re.sub('artificial intelligence', ' ai_engineer ', s)
-   
     
     s = re.sub('cloud', ' cloud_engineer ', s)
     s = re.sub('cloud_engineer', ' cloud_engineer ', s)
@@ -470,8 +459,6 @@ def get_job_title(row):
         row['first_match'] = True
         
     row['cp1_title'] = s
-     
-    
 
     return row
     
@@ -490,3 +477,33 @@ def false_col(row):
 
     row['first_match'] = 'False'
     return row
+    
+    
+def check_pattern_in_string(s, keywords):
+    regex_pattern = '|'.join(re.escape(keyword) for keyword in keywords)
+    matched_keywords = re.findall(regex_pattern, s, re.IGNORECASE)
+    return matched_keywords
+
+
+def check_skills(row, keywords, check_column = "job_description", skill_column = "skills"):
+    s = row[check_column]
+    matched_keywords = check_pattern_in_string(s, keywords)
+    
+    if matched_keywords:
+        row[skill_column] = matched_keywords
+
+    return row
+
+def check_german_style(row):
+
+    s = row["job_description"]
+    
+    informal_keywords = ['du', 'deine']
+    
+    is_informal = any(keyword in s for keyword in informal_keywords)
+    
+    if is_informal:
+        row["language"] = 'ger+'
+        
+    return s
+    
