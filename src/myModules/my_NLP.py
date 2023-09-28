@@ -410,7 +410,7 @@ def time_to_weeks(row):
     
 
     if 'minute' in posting_date or 'hour' in posting_date or 'Just now' in posting_date:
-        new_date = posting_date
+        new_date = scrap_date
     if 'day' in posting_date:
         days = int(posting_date.split(' ')[0])
         new_date = scrap_date - timedelta(days=days)

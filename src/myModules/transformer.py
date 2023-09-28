@@ -7,7 +7,7 @@ import json
 import pandas as pd
 from datetime import datetime, timedelta
 from datetime import datetime
-
+from datetime import date
 
 with open("config/config.json", 'r') as f:
     config = json.load(f)
@@ -23,7 +23,7 @@ input_name = "skills_df"
 
 # print(data.head(10))
 
-def agg_skill_data(data):
+def agg_skill_data(data, top_n=20):
     
     all_skills = []
     for skill_list in data['skills']:
@@ -47,6 +47,10 @@ def agg_skill_data(data):
     skill_data = skill_data[skill_data.keywords != '']
     skill_data['percentage'] = round(skill_data['counts'] / len(data) * 100, 1)
     
+    if top_n is not None:
+        skill_data = skill_data.nlargest(top_n, 'counts')
+        
+    
     return skill_data
 
 
@@ -56,6 +60,69 @@ def agg_top_job(data):
     return new_data
 
 
+def top_jobs(df, yes_jobs, no_jobs):
+    
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = 0
+                
+    page_size = 50  # Number of rows per page
+    total_pages = -(-len(df) // page_size)
+    start_idx = st.session_state.current_page * page_size  # Starting index of the page
+    end_idx = start_idx + page_size  # Ending index of the page
+
+    page_data = df.iloc[start_idx:end_idx]
+
+    # Create columns for navigation buttons and page info
+    col_nav1, col_nav2, col_nav3 = st.columns([1, 1, 4.5])
+
+    # Place buttons in the first and second columns
+    with col_nav1:
+        if st.button('Previous'):
+            st.session_state.current_page -= 1  # Move to the previous page
+            st.session_state.current_page = max(0, st.session_state.current_page)  # Don't go below 0
+
+    with col_nav2:
+        if st.button('Next'):
+            st.session_state.current_page += 1  # Move to the next page
+            st.session_state.current_page = min(total_pages-1, st.session_state.current_page)  # Don't exceed max pages
+
+    # Display page info in the third column
+    with col_nav3:
+        st.write(f"Page {st.session_state.current_page + 1} of {total_pages}  -  Total results: {len(df)}")
+
+    # if st.button('Next'):
+    #     st.session_state.current_page += 1  # Move to the next page
+    # if st.button('Previous'):
+    #     st.session_state.current_page -= 1  # Move to the previous page
+    #     st.session_state.current_page = max(0, st.session_state.current_page)  # Don't go below 0
+    
+    df.reset_index(drop=True, inplace=True)
+    for index, row in page_data.iterrows():
+        col1, col2 = st.columns([4, 1])            
+        with col1.expander(f"{row['company']} - {row['title']}"):
+
+            st.header(f"{row['title']}")
+            st.write(f"{row['company']} - {row['city']}")
+
+            
+            time = date.today() - row['calc_posting_date']
+            st.write(time)
+            
+            st.write(f"{row['skills']}")
+            st.write(f"URL: [Link]({row['url']})")
+            st.write(f"Preview: {row['job_description'][:1000]}...")
+            
+        empty1, col2_1, empty2, col2_2, empty3 = col2.columns([1, 1, 1, 1, 1])
+
+        if col2_1.button('Y', key=f"yes_{index}"):
+            yes_jobs.append(row.to_dict())
+        if col2_2.button('N', key=f"no_{index}"):
+            no_jobs.append(row.to_dict())
+
+
+    
+            
+    return yes_jobs, no_jobs
 
 
 
