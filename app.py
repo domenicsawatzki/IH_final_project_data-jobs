@@ -13,19 +13,15 @@ import matplotlib.pyplot as plt
 
 import os
 
+
+import streamlit as st
+
+# setup page config
 st.set_page_config(
     page_title='Data Job App',
     layout='wide'
 )
 add_page_title()
-
-
-# setup page config
-
-    
-
-
-st.write(os.getcwd())
 
 # load config for path management
 with open("config/config.json", 'r') as f:
@@ -34,13 +30,10 @@ with open("config/config.json", 'r') as f:
 NLP_data_path = config['NLP_data_path']
 input_name = "skills_df"
 
-
 # create sidebar 
 st.sidebar.success('Select a page above')
 
-
 # add page names
-
 show_pages(
     [
         Page("app.py", "Today's top jobs", ''),
@@ -49,11 +42,9 @@ show_pages(
     ]
 )
 
-
-
 # open and load dataframe
 with open(f"{NLP_data_path}{input_name}.pkl", "rb") as f:
     data = pickle.load(f)
 
 
-skill_data = myBib.agg_skill_data(data)
+

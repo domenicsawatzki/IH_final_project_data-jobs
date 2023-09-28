@@ -7,6 +7,10 @@ import pandas as pd
 import numpy as np
 from src.myModules import transformer as myBib
 
+import streamlit as st
+
+
+
 st.set_page_config(
     page_title='Data Job App',
     layout='wide'
@@ -23,28 +27,41 @@ with open("config/config.json", 'r') as f:
 NLP_data_path = config['NLP_data_path']
 input_name = "skills_df"
 
-
-
 # open and load dataframe
 with open(f"{NLP_data_path}{input_name}.pkl", "rb") as f:
     data = pickle.load(f)
 
 
-prep_data = myBib.prepare_dataset(data)
-skill_data = myBib.agg_skill_data(prep_data)
+filter_list = ['data_analyst', 'analytics_engineer','bi_analyst', 'ml_engineer', 'business_analyst', 'bi_analyst', 'data_scientist', 'data_engineer']
+
+# pre filter for dataset
+job_filter_dict = { 'All':filter_list, 'Data Analyst':'data_analyst', 'Data Engineer':'data_engineer', 'Data Scientist':'data_scientist', 'Business Analyst':'business_analyst','Bi Analyst':'bi_analyst' ,
+                   'Analytics Engineer':'analytics_engineer', 'Machine Learning Engineer':'ml_engineer'}
 
 
-# interactive_plot(skill_data)   
-st.dataframe(skill_data)
+job_selection = st.selectbox('Select a Job Title:', list(job_filter_dict.keys()))
 
-st.bar_chart(data=skill_data, x = 'keywords', y = 'percentage')
+
+if job_selection == 'All':
+    filtered_df = data
+    counter = len(filtered_df)
+if job_selection != 'All':
+    filtered_df = data[data['new_job_title'].apply(lambda x: job_filter_dict[job_selection] in x)]
+    counter = len(filtered_df)
+
+st.write(f"{counter} jobs found in dataset.")
+skill_data = myBib.agg_skill_data(filtered_df) #prepare dataframe for top list
 
 df_sorted = skill_data.sort_values('percentage', ascending=False)
 
+# st.write(f"{counter} jobs found")
 
 chart = alt.Chart(df_sorted).mark_bar().encode(
     x='percentage',
     y=alt.X('keywords', sort=None)
+).properties(
+    width=1000,  # Width in pixels
+
 )
 
 labels = chart.mark_text(

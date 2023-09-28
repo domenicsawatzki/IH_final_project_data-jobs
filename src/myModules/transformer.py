@@ -50,8 +50,8 @@ def agg_skill_data(data):
     return skill_data
 
 
-
-
+def agg_top_job(data):
+    return data
 
 
 
