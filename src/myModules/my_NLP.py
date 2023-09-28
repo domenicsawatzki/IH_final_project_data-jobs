@@ -28,7 +28,12 @@ import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from matplotlib import rcParams
 from wordcloud import WordCloud, STOPWORDS
+
 import spacy
+
+from datetime import datetime, timedelta
+from datetime import datetime
+
 
 nlp = spacy.load("de_core_news_sm")
 
@@ -57,6 +62,8 @@ def clean_up(s):
     s = re.sub(r'(?<=\w)\.', ' . ', s)
     # s = re.sub(r'(?<=\w)\|', ' | ', s)
     s = re.sub('--', ' ', s)
+    s = re.sub('––', ' ', s)
+    s = re.sub('–', ' ', s)
     s = re.sub('&', ' ', s)
 
 
@@ -104,124 +111,6 @@ def remove_stopwords_german(l, language = 'german'):
 def re_blob(x):
     return " ".join(x)
 
-
-
-# def combine_keywords(s):
-
-#     s = re.sub('data analyst', ' data_analyst ', s)
-#     s = re.sub('data analyst', ' data_analyst ', s)
-    
-    
-#     s = re.sub('data engineer', ' data_engineer ', s)
-    
-#     s = re.sub('business analyst', ' business_analyst ', s)
-#     s = re.sub('business-analyst', ' business_analyst ', s)
-    
-#     s = re.sub('product analyst', ' product_analyst ', s)
-    
-#     s = re.sub('business intelligence analyst', ' bi_analyst ', s)
-#     s = re.sub('business intelligence', ' bi_analyst ', s)
-#     s = re.sub('bi ', ' bi_analyst ', s)
-    
-#     s = re.sub('programm manager', ' programm_manager ', s)
-     
-#     s = re.sub('software_engin', ' software_engineer ', s) 
-#     s = re.sub('software engineer', ' software_engineer ', s)
-#     s = re.sub('software_engineereer', ' software_engineer ', s)
-
-#     s = re.sub('software-architect', ' software_architect ', s)
-    
-#     s = re.sub('software developer', ' software_developer ', s)
-#     s = re.sub('software entwickler', ' software_developer ', s)
-#     s = re.sub('softwareentwickler', ' software_developer ', s)
-#     s = re.sub('software_develop', ' software_developer ', s)
-#     s = re.sub('software-entwickler', ' software_developer ', s)
-#     s = re.sub('softwar develop', ' software_developer ', s)
-#     s = re.sub('software_develop', ' software_developer ', s)
-#     s = re.sub('developer ', ' software_developer ', s)
-#     s = re.sub('software ', ' software_developer ', s)
-    
-    
-#     s = re.sub('system engineer', ' system_engineer ', s)
-    
-#     s = re.sub('analysis engineer', ' analysis_engineer ', s)
-    
-#     s = re.sub('data science', ' data_scientist ', s)
-#     s = re.sub('data scientist', ' data_scientist ', s)
-    
-    
-#     s = re.sub('machine learn engineer', ' ml_engineer ', s)
-#     s = re.sub('machine learn', ' ml_engineer ', s)
-#     s = re.sub('machine_learn', ' ml_engineer ', s)
-#     s = re.sub('ml ', ' ml_engineer ', s)
-    
-#     s = re.sub('ai ', ' ai_engineer ', s)
-#     s = re.sub('artificial intelligence', ' ai_engineer ', s)
-    
-#     s = re.sub('cloud', ' cloud_engineer ', s)
-#     s = re.sub('cloud_engin', ' cloud_engineer ', s)
-    
-    
-#     s = re.sub('devops engineer ', ' devops_engineer ', s)
-#     s = re.sub('devops engin', ' devops_engineer ', s)
-#     s = re.sub('devop engin', ' devops_engineer ', s)
-    
-    
-#     s = re.sub('devolop engin ', ' develop_engineer ', s)
-#     s = re.sub('devolop_engineer', ' develop_engineer ', s)
-#     s = re.sub('entwicklungsingenieur', ' develop_engineer ', s)
-    
-    
-    
-#     s = re.sub('fp & a', ' fp&a_analyst ', s)
-    
-#     s = re.sub('deep learn', ' deep_learning ', s)
-#     s = re.sub('reporting analyst', ' reporting_analyst ', s)
-    
-#     s = re.sub('sap ', ' sap_specialist ', s)
-
-#     s = re.sub('data analytics', ' data_analytics ', s)
-    
-#     s = re.sub('control', ' controlling_ ', s)
-
-#     s = re.sub('test engineer', ' test_engineer ', s)
-#     s = re.sub('test engin', ' test_engineer ', s)
-    
-#     s = re.sub('big data', ' big_data_engineer/specialist ', s)
-    
-#     s = re.sub('java', ' java_software_engineer ', s)
-#     s = re.sub('java-', ' java_software_engineer ', s)
-#     s = re.sub('java ', ' java_software_engineer ', s)
-    
-#     s = re.sub('backend ', ' backend_developer ', s)
-    
-#     s = re.sub('it ', ' it_systemadmin ', s)
-#     s = re.sub('systemadministrator', ' it_systemadmin ', s)
-    
-    
-#     s = re.sub('data manag ', ' data_management ', s)
-    
-#     s = re.sub('full stack ', ' full_stack ', s)
-#     s = re.sub('full-stack ', ' full_stack ', s)
-#     s = re.sub('fullstack ', ' full_stack ', s)
-    
-#     s = re.sub('database administr ', ' database_datawarehouse ', s)
-#     s = re.sub('datenbankadministr ', ' database_datawarehouse ', s)
-#     s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
-#     s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
-#     s = re.sub('datenbank-administr ', ' database_datawarehouse ', s)
-#     s = re.sub('data warehous', ' database_datawarehouse ', s)
-    
-    
-#     s = re.sub('research scientist ', ' research_scientist ', s)
-#     s = re.sub(' scientist ', ' scientist_ ', s)
-    
-#     s = re.sub('data architect', 'data_architect', s)
-    
-    
-    
-    
-#     return s
 
 def drop_words(s):
     
@@ -506,4 +395,44 @@ def check_german_style(row):
         row["language"] = 'ger+'
         
     return s
+
+def prepare_dataset(data):
+    data = data.apply(time_to_weeks, axis=1) # add transform posting date to date format
+    data.fillna("", inplace=True)
+    # data['skills'] = data['skills'].progress_apply(lambda x: list(set(x))) # remove duplicates from skills
+    data['skills'] = data['skills'].apply(remove_duplicates_and_lower) # lower
+    return data 
+
+
+def time_to_weeks(row):
+    scrap_date = row['scraping_date']
+    posting_date = row['posting_date']    
     
+
+    if 'minute' in posting_date or 'hour' in posting_date or 'Just now' in posting_date:
+        new_date = posting_date
+    if 'day' in posting_date:
+        days = int(posting_date.split(' ')[0])
+        new_date = scrap_date - timedelta(days=days)
+    if 'week' in posting_date:
+        weeks = int(posting_date.split(' ')[0])
+        new_date = scrap_date - timedelta(weeks=weeks)
+    if 'month' in posting_date:
+        months = int(posting_date.split(' ')[0])
+        new_date = pd.to_datetime(scrap_date) - pd.DateOffset(months=months)
+    if 'year' in posting_date:
+        years = int(posting_date.split(' ')[0])
+        new_date = pd.to_datetime(scrap_date) - pd.DateOffset(years=years)
+    
+    
+    if isinstance(new_date, datetime):    
+        row['calc_posting_date'] = new_date.date()
+    else:
+        row['calc_posting_date'] = new_date
+        
+        
+    return row
+
+
+def remove_duplicates_and_lower(skill_list):
+    return list(set([skill.lower() for skill in skill_list]))
