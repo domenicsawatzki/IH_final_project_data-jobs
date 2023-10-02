@@ -1,38 +1,34 @@
-from tqdm import tqdm
-import pandas as pd 
-from langdetect import detect
-import nltk
-from nltk.stem import WordNetLemmatizer 
+from tqdm import tqdm  
+import pandas as pd  
+from langdetect import detect  
+import nltk  
+from nltk.stem import WordNetLemmatizer  
 
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer 
-import re
-import pandas as pd
-import nltk
-from nltk.stem import WordNetLemmatizer 
-from sklearn.feature_extraction.text import CountVectorizer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import wordnet
-from nltk.corpus import stopwords
+from sklearn.feature_extraction.text import CountVectorizer  
+from nltk.tokenize import word_tokenize  
+from nltk.stem import WordNetLemmatizer  
+import re  
+import pandas as pd  
+import nltk  
+from nltk.stem import WordNetLemmatizer  
+from sklearn.feature_extraction.text import CountVectorizer  
+from nltk.tokenize import word_tokenize  
+from nltk.corpus import wordnet  
+from nltk.corpus import stopwords  
 
-# nltk.download('omw-1.4')
-# nltk.download('wordnet') # wordnet is the most well known lemmatizer for english
-# nltk.download('punkt')
-# nltk.download('stopwords')
 
-import collections
-import numpy as np
-import pandas as pd
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-from wordcloud import WordCloud, STOPWORDS
+import collections  
+import numpy as np  
+import pandas as pd  
+import matplotlib.cm as cm  
+import matplotlib.pyplot as plt  
+from matplotlib import rcParams  
+from wordcloud import WordCloud, STOPWORDS  
 
-import spacy
+import spacy  
 
-from datetime import datetime, timedelta
-from datetime import datetime
+from datetime import datetime, timedelta  
+from datetime import datetime  
 
 
 nlp = spacy.load("de_core_news_sm")
@@ -58,9 +54,7 @@ def clean_up(s):
     pattern_to_remove = r'\([a-z]/[a-z]/[a-z]\)'
     s = re.sub(pattern_to_remove, '', s)
     s = re.sub('all genders', '', s)
-    # s = re.sub('[\,()/:;*?!&–|]', ' ', s)
     s = re.sub(r'(?<=\w)\.', ' . ', s)
-    # s = re.sub(r'(?<=\w)\|', ' | ', s)
     s = re.sub('--', ' ', s)
     s = re.sub('––', ' ', s)
     s = re.sub('–', ' ', s)
@@ -187,7 +181,6 @@ def extract_level(row):
         
 
 
-# nlp_df['level'] = nlp_df['cp1_title'].apply(lambda x: 'True' if any(word.lower() in x.lower() for word in words_to_find) else 'False')
 
 def word_cloud(df, column):
     title_list = df[column].tolist()
@@ -399,7 +392,6 @@ def check_german_style(row):
 def prepare_dataset(data):
     data = data.apply(time_to_weeks, axis=1) # add transform posting date to date format
     data.fillna("", inplace=True)
-    # data['skills'] = data['skills'].progress_apply(lambda x: list(set(x))) # remove duplicates from skills
     data['skills'] = data['skills'].apply(remove_duplicates_and_lower) # lower
     return data 
 

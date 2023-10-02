@@ -1,13 +1,13 @@
-import streamlit as st 
-from st_pages import Page, show_pages, add_page_title
-import json 
-import pickle
-import altair as alt
-import pandas as pd 
-import numpy as np
-from src.myModules import transformer as myBib
+import streamlit as st  
+from st_pages import Page, show_pages, add_page_title  
+import json  
+import pickle  
+import altair as alt  
+import pandas as pd  
+import numpy as np  
+from src.myModules import transformer as myBib  
 
-import streamlit as st
+import streamlit as st  
 
 
 
@@ -20,14 +20,12 @@ st.set_page_config(
 add_page_title()
 
 
-# load config for path management
 with open("config/config.json", 'r') as f:
     config = json.load(f)
     
 NLP_data_path = config['NLP_data_path']
 input_name = "skills_df"
 
-# open and load dataframe
 with open(f"{NLP_data_path}{input_name}.pkl", "rb") as f:
     data = pickle.load(f)
 
@@ -49,7 +47,6 @@ else:
 
 
 filter_list = []
-# pre filter for dataset
 job_filter_dict = { 'All':filter_list, 'Data Analyst':'data_analyst', 'Data Engineer':'data_engineer', 'Data Scientist':'data_scientist', 'Business Analyst':'business_analyst','Bi Analyst':'bi_analyst' ,
                    'Analytics Engineer':'analytics_engineer', 'Machine Learning Engineer':'ml_engineer'}
 filter_list = list(job_filter_dict.keys())
@@ -69,7 +66,6 @@ skill_data = myBib.agg_skill_data(filtered_df, top_n) #prepare dataframe for top
 
 df_sorted = skill_data.sort_values('percentage', ascending=False)
 
-# st.write(f"{counter} jobs found")
 
 chart = alt.Chart(df_sorted).mark_bar().encode(
     x='percentage',

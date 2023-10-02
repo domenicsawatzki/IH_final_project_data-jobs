@@ -1,14 +1,14 @@
-from bs4 import BeautifulSoup, NavigableString
-import pandas as pd
-from datetime import date
-from datetime import datetime
-from tqdm import tqdm
-import pickle
-import requests
-from random import randint
-from time import sleep
-import os
-import json
+from bs4 import BeautifulSoup, NavigableString  # Importing necessary libraries
+import pandas as pd  # Importing necessary libraries
+from datetime import date  # Importing necessary libraries
+from datetime import datetime  # Importing necessary libraries
+from tqdm import tqdm  # Importing necessary libraries
+import pickle  # Importing necessary libraries
+import requests  # Importing necessary libraries
+from random import randint  # Importing necessary libraries
+from time import sleep  # Importing necessary libraries
+import os  # Importing necessary libraries
+import json  # Importing necessary libraries
 
 
 os.chdir('c:/Users/Domen/IronHack/01_projects/IH_final_project_data-jobs')
@@ -22,8 +22,6 @@ cleaned_data_path = config["cleaned_data_path"]
 webscrap_data_path = config["webscrap_data_path"]    
 
 
-# soup_file =  'soup_dictV2'
-# keyword_file = 'keyword_dictV2'
 
 
 def get_all_job_information(id, response, scrap_date):
@@ -35,31 +33,26 @@ def get_all_job_information(id, response, scrap_date):
         job_dict['title'] = soup.find('h2', class_='top-card-layout__title').text.strip()
     except:
         job_dict['title'] = None
-        # print("Error: in 'title'")
         
     try:    
         job_dict['company'] = soup.find("div",{"class":"top-card-layout__card"}).find("a").find("img").get('alt')
     except:
         job_dict['company'] = None
-        # print("Error: in 'company'")
         
     try:    
         job_dict['city'] = soup.find("span",{"class":"topcard__flavor topcard__flavor--bullet"}).text.strip()
     except:
         job_dict['city'] = None
-        # print("Error: in 'city'")
     try:
         job_dict['posting_date'] = soup.find("span", {"class":"posted-time-ago__text"}).text.strip()
     except:
         job_dict['posting_date'] = None
-        # print("Error: in 'posting date'")
         
     try:    
         job_dict['job_description'] = soup.find("section",{"class":"show-more-less-html"}).text.strip()
 
     except:
         job_dict['job_description'] = None
-        # print("Error: in 'job description'")
 
     try:    
         x = get_job_information(soup)        
@@ -68,7 +61,6 @@ def get_all_job_information(id, response, scrap_date):
         job_dict['job_function'] = x[2]
         job_dict['industries'] = x[3]
     except:
-        # print(f"Error: get job information in id {id}")
         job_dict['seniority_level'] = None
         job_dict['employment_type'] = None
         job_dict['job_function'] = None
