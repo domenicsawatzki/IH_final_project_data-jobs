@@ -62,6 +62,25 @@ def agg_top_job(data):
 
 def top_jobs(df, yes_jobs, no_jobs):
     
+    
+    #     # Handle non-datetime values
+    # df['calc_posting_date'] = pd.to_datetime(df['calc_posting_date'], errors='coerce')
+    
+    # # Drop NaT values
+    # df.dropna(subset=['calc_posting_date'], inplace=True)
+
+    # # st.write(type(df['calc_posting_date'].iloc[0]))
+    # # st.write(type(date_filter))
+    
+    # # st.write(df['calc_posting_date'].head())
+    # # st.write(date_filter)
+
+    # # st.write(df['calc_posting_date'].iloc[0] > date_filter)
+
+    # # date_filter = pd.Timestamp(date_filter)
+    
+    # # df = df.loc[df['calc_posting_date'] > date_filter]
+    
     if 'current_page' not in st.session_state:
         st.session_state.current_page = 0
                 
@@ -125,6 +144,17 @@ def top_jobs(df, yes_jobs, no_jobs):
     return yes_jobs, no_jobs
 
 
+def compare_skills_count(row_skills):
+    my_skills = ["python", "sql", 'tableau', "r", "pandas"]
+    return len(set(row_skills) & set(my_skills))
+
+
+
+
+def skill_df(df):
+    df['skills_match_count'] = df['skills'].apply(compare_skills_count)
+    df = df.sort_values(by='skills_match_count', ascending=False)
+    return df
 
 
 # def prepare_dataset(data):

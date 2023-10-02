@@ -54,6 +54,9 @@ with open(f"{NLP_data_path}{input_name}.pkl", "rb") as f:
     data = pickle.load(f)
 
 
+# st.dataframe(data)
+
+
 # # Sidebar for the Search Profile Page
 # st.header("Set Up Your Search Profile")
 

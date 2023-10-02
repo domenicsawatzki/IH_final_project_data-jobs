@@ -44,6 +44,7 @@ input_name = "skills_df"
 with open(f"{NLP_data_path}{input_name}.pkl", "rb") as f:
     data = pickle.load(f)
 
+data = myBib.skill_df(data)
 
 
 
@@ -78,6 +79,8 @@ date_filter = st.sidebar.radio(
         "Last Month", "Last 2 Months"]
 )
 
+
+# st.dataframe(data)
 if date_filter == "Last Week":
     time_filter = date.today() - pd.Timedelta(days=7)
 elif date_filter == "Last 2 Weeks":
@@ -90,7 +93,7 @@ elif date_filter == "Last Month":
 elif date_filter == "Last 2 Months":
     time_filter = date.today() - pd.Timedelta(days=60)
 
-
+# st.write(time_filter)
 # Initialize an empty DataFrame for filtered data
 filtered_df = pd.DataFrame()
 

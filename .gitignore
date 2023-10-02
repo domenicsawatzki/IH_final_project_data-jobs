@@ -8,3 +8,4 @@ webscraper/archiv/
 *.csv
 *.txt
 keyword_list.csv
+documentation/
