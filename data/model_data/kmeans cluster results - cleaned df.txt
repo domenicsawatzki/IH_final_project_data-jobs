@@ -1,0 +1,30 @@
+kmeans cluster results - cleaned df
+
+0 = controlling
+1 = software engineer
+2 = system_adm
+3 = unknown
+4 = backend
+5 = sales
+6 = it/system admin
+7 = developer
+8 = Analyst
+9 = data management
+10 = software engineer/backend
+11 = chemie
+12 = software developer
+13 = fullstack
+14 = devop
+15 = unknown
+16 = administration
+17 = scientist
+18 = enwicklungsingenieur
+19 = developer
+20 = application
+21 = software mix
+22 = production?
+23 = architect
+24 = doctor
+25 = data 
+26 = 
+27 = 

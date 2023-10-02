@@ -3,9 +3,8 @@ IH_final_project_data-jobs/myenv/
 myenv/
 webscraper/archiv/
 *.pkl
-*.wav
-*.json
+*.wav 
 *.csv
-*.txt
 keyword_list.csv
 documentation/
+*.sql
